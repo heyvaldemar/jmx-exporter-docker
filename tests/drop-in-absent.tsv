@@ -1,0 +1,65 @@
+# Executables the last versioned bitnami/jmx-exporter image (bitnamilegacy/jmx-exporter:1.4.0-debian-12-r0,
+# Debian 12) has on its PATH and this image (Debian 13) does not. A shell glob, a tab, the reason.
+# tests/drop-in-test.sh fails on any absence not matched here. Nothing Bitnami's charts run is on this list:
+# they call java, and only java.
+install_packages	Bitnami's own package helper script, not part of Debian
+uninstall_packages	Bitnami's own package helper script, not part of Debian
+run-script	Bitnami's own helper script
+initctl	minideb's stub that keeps services from starting during apt-get install; not part of Debian, and this image starts no services
+jfr	a JDK tool; Debian packages it with the JDK (openjdk-21-jdk-headless), not with the runtime this image carries
+jrunscript	a JDK tool; Debian packages it with the JDK (openjdk-21-jdk-headless), not with the runtime this image carries
+perl5.36*	Debian 12's full Perl, which minideb carried; this image has Debian 13's perl-base and runs no Perl
+cpan*	part of Debian 12's full Perl distribution; this image has perl-base only
+corelist	part of Debian 12's full Perl distribution; this image has perl-base only
+enc2xs	part of Debian 12's full Perl distribution; this image has perl-base only
+encguess	part of Debian 12's full Perl distribution; this image has perl-base only
+h2ph	part of Debian 12's full Perl distribution; this image has perl-base only
+h2xs	part of Debian 12's full Perl distribution; this image has perl-base only
+instmodsh	part of Debian 12's full Perl distribution; this image has perl-base only
+json_pp	part of Debian 12's full Perl distribution; this image has perl-base only
+libnetcfg	part of Debian 12's full Perl distribution; this image has perl-base only
+perlbug	part of Debian 12's full Perl distribution; this image has perl-base only
+perldoc	part of Debian 12's full Perl distribution; this image has perl-base only
+perlivp	part of Debian 12's full Perl distribution; this image has perl-base only
+perlthanks	part of Debian 12's full Perl distribution; this image has perl-base only
+piconv	part of Debian 12's full Perl distribution; this image has perl-base only
+pl2pm	part of Debian 12's full Perl distribution; this image has perl-base only
+pod2*	part of Debian 12's full Perl distribution; this image has perl-base only
+podchecker	part of Debian 12's full Perl distribution; this image has perl-base only
+prove	part of Debian 12's full Perl distribution; this image has perl-base only
+ptar*	part of Debian 12's full Perl distribution; this image has perl-base only
+shasum	part of Debian 12's full Perl distribution; sha256sum and the other coreutils sums are here
+splain	part of Debian 12's full Perl distribution; this image has perl-base only
+streamzip	part of Debian 12's full Perl distribution; this image has perl-base only
+xsubpp	part of Debian 12's full Perl distribution; this image has perl-base only
+zipdetails	part of Debian 12's full Perl distribution; this image has perl-base only
+findrule	a Perl module's script (libfile-find-rule-perl) minideb carried; find is here
+adduser	Debian 13's slim image does not ship adduser; nothing in a running exporter adds users
+addgroup	Debian 13's slim image does not ship adduser; nothing in a running exporter adds groups
+deluser	Debian 13's slim image does not ship adduser; nothing in a running exporter removes users
+delgroup	Debian 13's slim image does not ship adduser; nothing in a running exporter removes groups
+apt-key	removed from Debian 13's apt
+dpkg-fsys-usrunmess	removed from Debian 13's dpkg
+gpgv	Debian 13's apt verifies archives with sqv, which is here
+md5sum.textutils	Debian 12's compatibility name for md5sum, which is here
+insserv	a sysvinit boot tool; a container boots nothing
+startpar	a sysvinit boot tool; a container boots nothing
+addpart	a disk partition tool Debian 13's slim image no longer ships; a container has no disks to partition
+delpart	a disk partition tool Debian 13's slim image no longer ships; a container has no disks to partition
+resizepart	a disk partition tool Debian 13's slim image no longer ships; a container has no disks to partition
+fsck.*	a filesystem tool Debian 13's slim image no longer ships; a container checks no filesystems
+mkfs.*	a filesystem tool Debian 13's slim image no longer ships; a container makes no filesystems
+hwclock	a hardware clock tool Debian 13's slim image no longer ships; a container cannot set the clock
+ctrlaltdel	a reboot setting Debian 13's slim image no longer ships; a container cannot reboot the host
+fincore	a page-cache tool Debian 13's slim image no longer ships
+lsfd	a util-linux listing tool Debian 13's slim image no longer ships; ps and /proc are here
+lsirq	a util-linux listing tool Debian 13's slim image no longer ships; /proc/interrupts is here
+last	a login-record tool Debian 13's slim image no longer ships; nobody logs in to this container
+lastb	a login-record tool Debian 13's slim image no longer ships; nobody logs in to this container
+lastlog	a login-record tool Debian 13's slim image no longer ships; nobody logs in to this container
+utmpdump	a login-record tool Debian 13's slim image no longer ships; nobody logs in to this container
+faillog	a login-record tool Debian 13's slim image no longer ships; nobody logs in to this container
+mesg	a terminal tool Debian 13's slim image no longer ships; nobody logs in to this container
+groupmems	an account tool Debian 13's slim image no longer ships; nothing in a running exporter changes groups
+cpgr	an account tool Debian 13's slim image no longer ships; nothing in a running exporter changes accounts
+cppw	an account tool Debian 13's slim image no longer ships; nothing in a running exporter changes accounts

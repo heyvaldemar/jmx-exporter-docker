@@ -1,0 +1,52 @@
+name: Pin Freshness
+# The pins that do not move with the weekly build: the two base digests and
+# the jmx_exporter release. Each goes red here when upstream has moved, so
+# the bump is a pull request someone reads, not a surprise in a Monday build.
+on:
+  schedule:
+    - cron: "40 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pins:
+    name: The base images and jmx_exporter against upstream
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Each pinned base digest still names its tag
+        if: always()
+        run: |
+          set -euo pipefail
+          fail=0
+          for name in maven:3.9.16-eclipse-temurin-21 debian:trixie-slim; do
+            pinned="$(grep -m1 -oE "${name}@sha256:[0-9a-f]{64}" Dockerfile)"
+            current="$(docker buildx imagetools inspect "$name" --format '{{json .Manifest}}' | jq -r .digest)"
+            if [ "${pinned#*@}" != "$current" ]; then
+              echo "::error::${name} is now ${current}; the Dockerfile pins ${pinned#*@}"; fail=1
+            else
+              echo "${name} ${current} is the pinned digest"
+            fi
+          done
+          exit "$fail"
+
+      # A new release is a pull request with a new commit pin and, almost
+      # always, new recorded checksums: scripts/record-checksums.sh.
+      - name: jmx_exporter is its newest release
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          pinned="$(sed -nE 's/^ARG JMX_EXPORTER=([0-9.]+):[0-9a-f]{40}$/\1/p' Dockerfile | sort -u)"
+          latest="$(gh api repos/prometheus/jmx_exporter/releases/latest --jq .tag_name)"
+          if [ "$pinned" != "$latest" ]; then
+            echo "::error::prometheus/jmx_exporter ${latest} is out; the Dockerfile pins ${pinned} (update JMX_EXPORTER with the tag and its commit, then run scripts/record-checksums.sh)"
+            exit 1
+          fi
+          echo "prometheus/jmx_exporter ${pinned} is the newest release"

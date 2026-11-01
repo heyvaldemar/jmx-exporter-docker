@@ -1,0 +1,32 @@
+# Keeps the pinned GitHub Actions and base images current. Every workflow here
+# pins its actions to a commit SHA, and the Dockerfile pins its two images
+# (maven with Eclipse Temurin 21 for the build, debian:trixie-slim for the
+# image) by digest; a pin never moves on its own, so Dependabot opens the pull
+# request, the real build gates it, and the auto-merge workflow merges it. A
+# new Maven image that resolves different artifacts fails that build on the
+# recorded checksums and waits for a person (scripts/record-checksums.sh).
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 3
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "ci"
+
+  # DAILY, AT 03:00 UTC: before the freshness check at 05:40, so a Debian
+  # repush is usually carried before the alarm can read it.
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "03:00"
+      timezone: "Etc/UTC"
+    commit-message:
+      prefix: "build"

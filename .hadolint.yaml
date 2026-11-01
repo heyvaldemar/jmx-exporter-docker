@@ -1,0 +1,14 @@
+# hadolint configuration for jmx-exporter-docker
+# https://github.com/hadolint/hadolint
+
+ignored:
+  # DL3008: Pin versions in apt-get install.
+  # Debian's security updates are carried by the weekly rebuild instead of
+  # pinned package versions, which would need a bump for every fix and would
+  # not improve the supply chain here: the base itself is pinned by digest.
+  - DL3008
+
+failure-threshold: warning
+
+trustedRegistries:
+  - docker.io

@@ -1,0 +1,47 @@
+name: Something does not work
+description: The exporter will not start, serves no metrics, or a chart that ran bitnami/jmx-exporter does not run this image.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Three of the four questions below exist because the answer usually
+        contains the problem. The one that matters most is the last: the
+        output, unedited.
+
+  - type: input
+    id: image
+    attributes:
+      label: Which image
+      description: The tag, and the digest if you pinned one (`docker buildx imagetools inspect heyvaldemar/jmx-exporter:1`).
+      placeholder: "heyvaldemar/jmx-exporter:1.7.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: how
+    attributes:
+      label: How it runs
+      description: The chart and its version with the values you set for its JMX exporter, or the exact `docker run` command.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and what happened instead
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: The output, unedited
+      description: |
+        `kubectl logs <pod> -c jmx-exporter` (or `docker logs <container>`),
+        and the first lines `curl http://<pod>:5556/metrics` returns.
+        Redact hostnames and passwords; leave everything else.
+      render: shell
+    validations:
+      required: true
