@@ -28,5 +28,15 @@ updates:
       interval: "daily"
       time: "03:00"
       timezone: "Etc/UTC"
+    # The Maven image's JDK writes the bytes of this project's own modules,
+    # which maven/checksums-workspace.sha512 records, so a move to another
+    # JDK fails the build on them (3.9-eclipse-temurin-26, 2026-11-02). Its
+    # tag moves by hand, with scripts/record-checksums.sh and a read diff.
+    ignore:
+      - dependency-name: "maven"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+          - "version-update:semver-patch"
     commit-message:
       prefix: "build"
