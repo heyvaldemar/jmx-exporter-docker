@@ -74,7 +74,19 @@ What is different, on purpose:
 
 ## CVE counts
 
-The `Publish Docker Image` workflow counts after every publish, on the images it has just published, and keeps the table as a run artifact. The first published images' counts go here with v1.0.0.
+Counted by Trivy 0.76.1 on 2026-11-02 in [run 41356102709](https://github.com/heyvaldemar/jmx-exporter-docker/actions/runs/41356102709), on the images as published, on `linux/amd64`, once per CVE and package, Debian's packages and the libraries inside the jars, with no vendor statements applied:
+
+| Image | What it is | OS | Critical | High | Medium | Low | Critical and high with a fix |
+|---|---|---|---|---|---|---|---|
+| `bitnamilegacy/jmx-exporter:1.4.0-debian-12-r0` | the last versioned `bitnami/jmx-exporter`, frozen 2025-08-27 | Debian 12.11 | 15 | 76 | 178 | 107 | 55 |
+| `bitnami/jmx-exporter:latest` | what `bitnami/jmx-exporter` publishes now | Photon OS 5.0 | 0 | 0 | 0 | 0 | 0 |
+| `heyvaldemar/jmx-exporter:1` | this image | Debian 13.7 | 1 | 45 | 71 | 66 | 0 |
+
+- **The last column is the one a rebuild controls.** Every critical and high finding left in this image is one Debian has not fixed yet: Trivy lists no fixed version for it. `scripts/cve-gate.sh` refuses to publish an image that carries one with a fix, so the week Debian ships a fix, the next build carries it or nothing is published.
+- **The frozen image only gets worse.** Of its 55 fixable findings, 8 are in the Java runtime Bitnami built into it and 47 in Debian 12's packages, 32 of those in Perl's. None of those fixes will reach it.
+- **`bitnami/jmx-exporter:latest` has no finding Trivy reports, and it is another image.** It runs jmx_exporter 1.7.0 too, on Photon OS with Bitnami's Java 17 and `JAVA_TOOL_OPTIONS` that load Bouncy Castle FIPS and replace Java's security properties, under one tag that moves to every jmx_exporter release. A chart pinned to `1.4.0-debian-12-r0` that moves to it changes its operating system, its Java security settings and its exporter in one step; this image keeps the Debian layout, and a tag that never leaves its jmx_exporter release.
+
+The workflow counts again after every publish and keeps the table as a run artifact.
 
 ## Nothing you used yesterday disappears today
 

@@ -9,6 +9,8 @@ image and the pipeline that builds it.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-02
+
 ### Added
 
 - **heyvaldemar/jmx-exporter: Prometheus's JMX exporter 1.7.0 on Debian 13 and Debian's OpenJDK 21, rebuilt every week.** Tags `1.7.0`, `1.7`, `1` and `latest`; `linux/amd64` and `linux/arm64`. `bitnami/jmx-exporter` has published only `latest` since August 2025, built on Photon OS, and its versioned tags stopped at `1.4.0-debian-12-r0`.
@@ -20,4 +22,5 @@ image and the pipeline that builds it.
 - **Every digest signed** with cosign, keyless, and every tag's signature verified after signing; SBOM, SLSA provenance and a GitHub build attestation; Trivy on the published image; CVE counts against the images it replaces after every publish.
 - **Every test shown the breaks it exists for**: sixteen planted violations in `tests/plants.tsv`, run in CI before anything is published.
 
-[Unreleased]: https://github.com/heyvaldemar/jmx-exporter-docker/commits/main
+[Unreleased]: https://github.com/heyvaldemar/jmx-exporter-docker/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/heyvaldemar/jmx-exporter-docker/releases/tag/v1.0.0
