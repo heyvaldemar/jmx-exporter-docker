@@ -9,6 +9,12 @@ image and the pipeline that builds it.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-11-05
+
+### Changed
+
+- **Debian's 2026-11-04 `debian:trixie-slim` repush is the base.** The pin moves from `sha256:f6b08b09…` to `sha256:a72b4433…`. jmx_exporter 1.7.0, the Maven build image and the recorded checksums stay as they were.
+
 ## [1.0.0] - 2026-11-02
 
 ### Added
@@ -22,5 +28,6 @@ image and the pipeline that builds it.
 - **Every digest signed** with cosign, keyless, and every tag's signature verified after signing; SBOM, SLSA provenance and a GitHub build attestation; Trivy on the published image; CVE counts against the images it replaces after every publish.
 - **Every test shown the breaks it exists for**: sixteen planted violations in `tests/plants.tsv`, run in CI before anything is published.
 
-[Unreleased]: https://github.com/heyvaldemar/jmx-exporter-docker/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/heyvaldemar/jmx-exporter-docker/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/heyvaldemar/jmx-exporter-docker/releases/tag/v1.0.1
 [1.0.0]: https://github.com/heyvaldemar/jmx-exporter-docker/releases/tag/v1.0.0
