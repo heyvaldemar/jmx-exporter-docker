@@ -19,18 +19,50 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # A NEW INDEX OVER THE SAME BUILDS IS NOT DRIFT. A tag names an index,
+      # and an index can be pushed again over the very same images: a
+      # platform added, an attestation rewritten. golang:1.27-bookworm and
+      # golang:1.27-trixie were on 2026-11-07, and two of these image
+      # repositories moved a pin for builds that had not changed. A moved
+      # digest is drift only when a build this image is made from moved under
+      # it: linux/amd64 for a stage built on the runner
+      # (--platform=$BUILDPLATFORM), linux/amd64 and linux/arm64 for a stage
+      # built for each published platform. A build that cannot be read is
+      # still drift.
       - name: Each pinned base digest still names its tag
         if: always()
         run: |
           set -euo pipefail
+          builds() { # builds <name@digest> <arch>... -> "arch:digest ..."; nothing if any is unreadable
+            local raw out="" d a
+            raw="$(docker buildx imagetools inspect --raw "$1" 2>/dev/null)" || return 0
+            shift
+            for a in "$@"; do
+              d="$(jq -r --arg a "$a" '[.manifests[]? | select(.platform.os == "linux" and .platform.architecture == $a and ($a != "amd64" or (.platform.variant // "") == ""))][0].digest // empty' <<<"$raw" 2>/dev/null)" || return 0
+              [ -n "$d" ] || return 0
+              out="$out $a:$d"
+            done
+            printf '%s\n' "${out# }"
+          }
           fail=0
           for name in maven:3.9.16-eclipse-temurin-21 debian:trixie-slim; do
-            pinned="$(grep -m1 -oE "${name}@sha256:[0-9a-f]{64}" Dockerfile)"
+            from="$(grep -m1 -E "^FROM .*${name}@sha256:[0-9a-f]{64}" Dockerfile)"
+            pinned="$(grep -oE "${name}@sha256:[0-9a-f]{64}" <<<"$from")"
+            case "$from" in
+              *"--platform=\$BUILDPLATFORM"*) arches=(amd64) ;;
+              *) arches=(amd64 arm64) ;;
+            esac
             current="$(docker buildx imagetools inspect "$name" --format '{{json .Manifest}}' | jq -r .digest)"
-            if [ "${pinned#*@}" != "$current" ]; then
-              echo "::error::${name} is now ${current}; the Dockerfile pins ${pinned#*@}"; fail=1
-            else
+            if [ "${pinned#*@}" = "$current" ]; then
               echo "${name} ${current} is the pinned digest"
+              continue
+            fi
+            was="$(builds "$pinned" "${arches[@]}")"
+            now="$(builds "${name}@${current}" "${arches[@]}")"
+            if [ -n "$was" ] && [ "$was" = "$now" ]; then
+              echo "::notice::${name} index moved from ${pinned#*@} to ${current} over the same builds (${was}): the image did not change and the pin stays"
+            else
+              echo "::error::${name} is now ${current}; the Dockerfile pins ${pinned#*@}"; fail=1
             fi
           done
           exit "$fail"
