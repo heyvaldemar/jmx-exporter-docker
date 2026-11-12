@@ -1,7 +1,7 @@
 name: Pin Freshness
 # The pins that do not move with the weekly build: the two base digests and
 # the jmx_exporter release. Each goes red here when upstream has moved, so
-# the bump is a pull request someone reads, not a surprise in a Monday build.
+# the bump is a commit someone reads, not a surprise in a Monday build.
 on:
   schedule:
     - cron: "40 5 * * *"
@@ -25,10 +25,11 @@ jobs:
       # golang:1.27-trixie were on 2026-11-07, and two of these image
       # repositories moved a pin for builds that had not changed. A moved
       # digest is drift only when a build this image is made from moved under
-      # it: linux/amd64 for a stage built on the runner
-      # (--platform=$BUILDPLATFORM), linux/amd64 and linux/arm64 for a stage
-      # built for each published platform. A build that cannot be read is
-      # still drift.
+      # it: linux/amd64 alone when every stage from that base is built on the
+      # runner (--platform=$BUILDPLATFORM or ${BUILDPLATFORM}), linux/amd64 and
+      # linux/arm64 when any stage is built for each published platform. The
+      # fleet's triage judges a re-pushed base the same way. A build that
+      # cannot be read is still drift.
       - name: Each pinned base digest still names its tag
         if: always()
         run: |
@@ -46,12 +47,15 @@ jobs:
           }
           fail=0
           for name in maven:3.9.16-eclipse-temurin-21 debian:trixie-slim; do
-            from="$(grep -m1 -E "^FROM .*${name}@sha256:[0-9a-f]{64}" Dockerfile)"
-            pinned="$(grep -oE "${name}@sha256:[0-9a-f]{64}" <<<"$from")"
-            case "$from" in
-              *"--platform=\$BUILDPLATFORM"*) arches=(amd64) ;;
-              *) arches=(amd64 arm64) ;;
-            esac
+            froms="$(grep -E "^FROM .*${name}@sha256:[0-9a-f]{64}" Dockerfile)"
+            pinned="$(grep -m1 -oE "${name}@sha256:[0-9a-f]{64}" <<<"$froms")"
+            arches=(amd64)
+            while IFS= read -r from; do
+              case "$from" in
+                *"--platform=\$BUILDPLATFORM"*|*"--platform=\${BUILDPLATFORM}"*) ;;
+                *) arches=(amd64 arm64) ;;
+              esac
+            done <<<"$froms"
             current="$(docker buildx imagetools inspect "$name" --format '{{json .Manifest}}' | jq -r .digest)"
             if [ "${pinned#*@}" = "$current" ]; then
               echo "${name} ${current} is the pinned digest"
@@ -67,8 +71,8 @@ jobs:
           done
           exit "$fail"
 
-      # A new release is a pull request with a new commit pin and, almost
-      # always, new recorded checksums: scripts/record-checksums.sh.
+      # A new release takes a new commit pin and, almost always, new
+      # recorded checksums: scripts/record-checksums.sh.
       - name: jmx_exporter is its newest release
         if: always()
         env:

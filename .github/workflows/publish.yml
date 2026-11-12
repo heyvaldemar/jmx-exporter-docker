@@ -7,7 +7,9 @@ on:
     branches: [main]
   schedule:
     # Weekly rebuild: the week's Debian security updates, Java's among them.
-    # The pinned digests and the jmx_exporter commit move only by pull request.
+    # The pinned digests and the jmx_exporter commit never move in this build:
+    # a commit on main moves them, a person's or, for a base re-pushed with
+    # the same toolchain, the fleet triage's.
     - cron: "20 6 * * 1"
   workflow_dispatch:
 
