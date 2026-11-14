@@ -131,7 +131,7 @@ ENV HOME=/ \
 
 LABEL org.opencontainers.image.title="jmx-exporter" \
       org.opencontainers.image.description="Prometheus's JMX exporter on Debian 13, built from source, rebuilt weekly, signed; a drop-in for bitnami/jmx-exporter." \
-      org.opencontainers.image.authors="Vladimir Mikhalev <v@valdemar.ai>" \
+      org.opencontainers.image.authors="Vladimir Mikhalev <connect@valdemar.ai>" \
       org.opencontainers.image.vendor="heyvaldemar" \
       org.opencontainers.image.source="https://github.com/heyvaldemar/jmx-exporter-docker" \
       org.opencontainers.image.documentation="https://github.com/heyvaldemar/jmx-exporter-docker#readme" \
