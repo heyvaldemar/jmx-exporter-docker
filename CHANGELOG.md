@@ -11,6 +11,13 @@ image and the pipeline that builds it.
 
 _(no unreleased changes yet)_
 
+## [1.0.3] - 2026-11-15
+
+### Changed
+
+- **A tag never names an unsigned image.** The build pushes the image by digest, with no tag (`push-by-digest=true`). The signing action signs it, attests it, checks that the signature is on Docker Hub and verifies as this workflow, and only then points the tags at it, with `docker buildx imagetools create --prefer-index=false`, which copies the index as it is, so each tag names the signed digest. Until 1.0.2 the tags moved with the push: anything that failed between the push and the signature left them on an unsigned image for a while. A run that cannot sign now names nothing, and every tag keeps naming what it named. The signing test shows it: with signing failing, `latest` stays on the earlier run's signed image and a tag new in that run never appears. The same as heyvaldemar/aws-kubectl-docker 2.3.2.
+- **Cosign is installed before anything is pushed.** The build job installs cosign v2.6.1 before the push, and the signing action finds it there; a failed install fails the job before even the untagged image is pushed.
+
 ## [1.0.2] - 2026-11-15
 
 ### Added
@@ -46,7 +53,8 @@ _(no unreleased changes yet)_
 - **Every digest signed** with cosign, keyless, and every tag's signature verified after signing; SBOM, SLSA provenance and a GitHub build attestation; Trivy on the published image; CVE counts against the images it replaces after every publish.
 - **Every test shown the breaks it exists for**: sixteen planted violations in `tests/plants.tsv`, run in CI before anything is published.
 
-[Unreleased]: https://github.com/heyvaldemar/jmx-exporter-docker/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/heyvaldemar/jmx-exporter-docker/compare/v1.0.3...HEAD
+[1.0.3]: https://github.com/heyvaldemar/jmx-exporter-docker/releases/tag/v1.0.3
 [1.0.2]: https://github.com/heyvaldemar/jmx-exporter-docker/releases/tag/v1.0.2
 [1.0.1]: https://github.com/heyvaldemar/jmx-exporter-docker/releases/tag/v1.0.1
 [1.0.0]: https://github.com/heyvaldemar/jmx-exporter-docker/releases/tag/v1.0.0
