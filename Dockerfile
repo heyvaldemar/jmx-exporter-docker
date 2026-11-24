@@ -83,7 +83,7 @@ COPY --from=build /out/checksums/ /
 # fix reaches this image the week Debian publishes it, the same way every
 # other package's does, and Trivy can see which Java it is.
 # ──────────────────────────────────────────────────────────────────────────────
-FROM debian:trixie-slim@sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2 AS final
+FROM debian:trixie-slim@sha256:8aa5a7bf5a1955bddbe7d74fcdd0b91ab30e74362a8b73af672b0481b35b44a0 AS final
 
 ARG TARGETARCH
 ARG JMX_EXPORTER=1.7.0:dc8a5741dc449e7a8a98bc153d702c456cf7b5f7
